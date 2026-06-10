@@ -1,0 +1,3 @@
+START_KEY = "."
+HOLD_ENABLED = False
+HOLD_DURATION = 0.5

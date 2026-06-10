@@ -1,0 +1,16 @@
+[project]
+name = "BindMacro"
+version = "1.0.0"
+description = "Macro program with GUI"
+requires-python = ">=3.10"
+dependencies = [
+    "keyboard",
+    "mouse",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
