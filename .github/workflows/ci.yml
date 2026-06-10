@@ -10,7 +10,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install ruff
-      - run: ruff check BindMacro/
+      - run: ruff check .
 
   build-exe:
     needs: lint
@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install pyinstaller keyboard mouse
-      - run: pyinstaller --onefile --windowed BindMacro/main.py --name BindMacro
+      - run: pyinstaller --onefile --windowed main.py --name BindMacro
       - uses: actions/upload-artifact@v4
         with:
           name: BindMacro-exe
