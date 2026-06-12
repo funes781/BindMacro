@@ -4,7 +4,6 @@ import keyboard
 import mouse
 import config
 
-
 class Binder:
     def __init__(self):
         self.selected_element = None
