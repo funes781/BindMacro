@@ -64,4 +64,5 @@ class Binder:
         threading.Thread(target=self.clicker_loop, daemon=True).start()
 
     def stop_macro(self):
+        # self.macro_running = False
         self.macro_running = False
