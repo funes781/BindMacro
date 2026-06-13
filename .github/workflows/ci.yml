@@ -1,5 +1,10 @@
 name: CI
-on: [push, pull_request]
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   lint:
@@ -26,3 +31,33 @@ jobs:
         with:
           name: BindMacro-exe
           path: dist/*.exe
+
+  release:
+    needs: build-exe
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: BindMacro-exe
+          path: dist
+      - name: Set release vars
+        id: set-vars
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "tag_name=build-${{ github.run_number }}" >> $GITHUB_OUTPUT
+            echo "release_name=Build #${{ github.run_number }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag_name=pr-${{ github.event.number }}-${{ github.run_number }}" >> $GITHUB_OUTPUT
+            echo "release_name=PR #${{ github.event.number }} - Build ${{ github.run_number }}" >> $GITHUB_OUTPUT
+          fi
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/BindMacro.exe
+          tag_name: ${{ steps.set-vars.outputs.tag_name }}
+          name: ${{ steps.set-vars.outputs.release_name }}
+          prerelease: ${{ github.event_name == 'pull_request' }}
+          generate_release_notes: true
