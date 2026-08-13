@@ -2,3 +2,4 @@ keyboard
 mouse
 pyinstaller
 ruff
+pytest

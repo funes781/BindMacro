@@ -30,17 +30,23 @@ def create_gui(binder):
         if binder.is_listening or binder.macro_running:
             return
         binder.start_binding()
-        btn_key.config(text="...", fg="red")
+        btn_key.config(text="... (Esc to cancel)", fg="red")
 
     def update_ui_after_bind():
         if binder.selected_element:
             btn_key.config(text=f"{binder.selected_element.upper()}", fg="black")
 
+    def update_ui_after_cancel():
+        label = binder.selected_element.upper() if binder.selected_element else "[ Click to bind ]"
+        btn_key.config(text=label, fg="black")
+
     binder.on_update_ui = update_ui_after_bind
+    binder.on_cancel_ui = update_ui_after_cancel
     binder.after_func = root.after
 
+    initial_label = binder.selected_element.upper() if binder.selected_element else "[ Click to bind ]"
     btn_key = tk.Button(
-        top_frame, text="[ Click to bind ]", width=18,
+        top_frame, text=initial_label, width=18,
         command=start_binding, bg="white"
     )
     btn_key.pack(side="left", padx=10)
@@ -49,7 +55,7 @@ def create_gui(binder):
     label_delay.pack(side="left", padx=2)
 
     entry_delay = tk.Entry(top_frame, width=6)
-    entry_delay.insert(0, "1.0")
+    entry_delay.insert(0, str(binder.delay_seconds))
     entry_delay.pack(side="left", padx=2)
 
     label_sec = tk.Label(top_frame, text="sec")
@@ -66,6 +72,7 @@ def create_gui(binder):
 
     def toggle_hold():
         binder.hold_enabled = hold_var.get()
+        binder.save_settings()
 
     chk_hold = tk.Checkbutton(mid_frame, variable=hold_var, command=toggle_hold)
     chk_hold.pack(side="left", padx=2)
@@ -78,6 +85,7 @@ def create_gui(binder):
             val = float(entry_hold.get())
             if val > 0:
                 binder.hold_duration = val
+                binder.save_settings()
         except ValueError:
             pass
 
@@ -128,5 +136,11 @@ def create_gui(binder):
             else None
         ),
     )
+
+    def on_close():
+        binder.shutdown()
+        root.destroy()
+
+    root.protocol("WM_DELETE_WINDOW", on_close)
 
     return root
